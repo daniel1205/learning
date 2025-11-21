@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hang Out Starter - Unit 3b 單字練習</title>
+    <style>
+        :root {
+            --primary: #06d6a0;       /* 清新的綠色 */
+            --primary-dark: #05b586;
+            --secondary: #118ab2;     /* 藍色 */
+            --accent: #ef476f;        /* 紅色強調 */
+            --bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text: #073b4c;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 0 #ddd;
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* 選單按鈕 */
+        .menu {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 1.1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: white;
+            color: #555;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+
+        .btn:hover { transform: translateY(-2px); }
+        .btn.active {
+            background-color: var(--primary);
+            color: white;
+            box-shadow: 0 6px 12px rgba(6, 214, 160, 0.3);
+        }
+
+        /* 內容區域 */
+        #app-container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        /* 單字卡模式 */
+        .flashcard {
+            background: var(--card-bg);
+            width: 160px;
+            height: 220px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.2s;
+            border-bottom: 5px solid var(--primary);
+            position: relative;
+        }
+
+        .flashcard:hover { transform: scale(1.05); }
+        
+        .card-id {
+            position: absolute; top: 10px; left: 15px;
+            font-size: 1.2rem; color: #ddd; font-weight: bold;
+        }
+
+        .emoji-icon { font-size: 4.5rem; margin-bottom: 15px; }
+        .word-text { font-size: 1.6rem; font-weight: bold; color: var(--text); }
+
+        /* 句子填空模式 */
+        .sentence-strip {
+            background: white;
+            width: 100%;
+            max-width: 700px;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            cursor: pointer;
+            border-left: 8px solid var(--secondary);
+            transition: background 0.2s;
+        }
+
+        .sentence-strip:hover { background: #eefbfb; }
+
+        .s-icon { font-size: 3rem; min-width: 60px; text-align: center; }
+        .s-text { font-size: 1.4rem; line-height: 1.5; flex-grow: 1; }
+
+        /* 模擬手寫填空的效果 */
+        .blank-space {
+            display: inline-block;
+            min-width: 80px;
+            border-bottom: 3px solid var(--text);
+            color: transparent;
+            text-align: center;
+            cursor: pointer;
+            padding: 0 5px;
+            transition: color 0.3s;
+            font-family: 'Comic Sans MS', 'Chalkboard SE', sans-serif; /* 手寫風格 */
+        }
+
+        .blank-space.revealed {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+
+        /* 遊戲模式 */
+        #game-panel {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 600px;
+        }
+
+        #game-instruction { font-size: 1.5rem; margin-bottom: 30px; color: #555; }
+        
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .option-btn {
+            font-size: 4rem;
+            background: #f0f4f8;
+            border: 3px solid transparent;
+            border-radius: 20px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-btn:hover { background: #e2e8f0; transform: scale(1.05); }
+        
+        .correct-anim { background: #d1fae5 !important; border-color: #06d6a0 !important; animation: bounce 0.5s; }
+        .wrong-anim { background: #fee2e2 !important; animation: shake 0.4s; }
+
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        /* 手機適配 */
+        @media (max-width: 600px) {
+            .flashcard { width: 45%; height: 180px; }
+            .emoji-icon { font-size: 3.5rem; }
+            .word-text { font-size: 1.3rem; }
+            .s-text { font-size: 1.1rem; }
+            .s-icon { font-size: 2.5rem; min-width: 50px; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🤖 單字特訓 Hang Out 3b</h1>
+    <div class="subtitle">點擊卡片聽發音，點擊底線看答案</div>
+
+    <div class="menu">
+        <button class="btn active" onclick="changeMode('cards')">🔤 認識單字</button>
+        <button class="btn" onclick="changeMode('sentences')">📝 句子填空</button>
+        <button class="btn" onclick="changeMode('game')">🎮 聽力大挑戰</button>
+    </div>
+
+    <div id="app-container"></div>
+
+    <script>
+        // 資料庫：完全對照圖片內容
+        // Igloo 沒有標準 Emoji，使用 ❄️🏠 (冰屋) 組合代替
+        const vocabList = [
+            { id: 1, word: "robot", plural: "Robots", emoji: "🤖", sentence: "{Robots} can do many things that people can't." },
+            { id: 2, word: "balloon", plural: "balloons", emoji: "🎈", sentence: "There are many {balloons} at my birthday party." },
+            { id: 3, word: "doll", plural: "doll", emoji: "🧸", sentence: "Barbie is a toy {doll}." },
+            { id: 4, word: "plane", plural: "planes", emoji: "✈️", sentence: "Pilots fly {planes}." },
+            { id: 5, word: "train", plural: "train", emoji: "🚂", sentence: "This is a long {train}." },
+            { id: 6, word: "monster", plural: "monster", emoji: "👾", sentence: "This {monster} has an eye and 4 arms." },
+            { id: 7, word: "room", plural: "room", emoji: "🛏️", sentence: "My {room} is clean and neat." },
+            { id: 8, word: "gorilla", plural: "Gorillas", emoji: "🦍", sentence: "{Gorillas} are big and strong." },
+            { id: 9, word: "iguana", plural: "Iguanas", emoji: "🦎", sentence: "{Iguanas} live in hot places." },
+            { id: 10, word: "igloo", plural: "Igloos", emoji: "❄️🏠", sentence: "{Igloos} are a type of shelter built from snow." }
+        ];
+
+        const container = document.getElementById('app-container');
+        let currentMode = 'cards';
+
+        // 語音合成
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.85; // 稍微放慢語速
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function changeMode(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            render();
+        }
+
+        function render() {
+            container.innerHTML = '';
+            if (currentMode === 'cards') renderCards();
+            else if (currentMode === 'sentences') renderSentences();
+            else if (currentMode === 'game') renderGame();
+        }
+
+        // 1. 單字卡模式
+        function renderCards() {
+            vocabList.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'flashcard';
+                card.innerHTML = `
+                    <div class="card-id">${item.id}</div>
+                    <div class="emoji-icon">${item.emoji}</div>
+                    <div class="word-text">${item.word}</div>
+                `;
+                card.onclick = () => {
+                    speak(item.word);
+                    // 簡單動畫
+                    card.style.transform = "scale(0.95)";
+                    setTimeout(()=> card.style.transform = "scale(1.05)", 100);
+                    setTimeout(()=> card.style.transform = "scale(1)", 200);
+                };
+                container.appendChild(card);
+            });
+        }
+
+        // 2. 句子填空模式
+        function renderSentences() {
+            vocabList.forEach(item => {
+                // 將 {word} 替換成 HTML 底線元素
+                // 這裡處理了單複數，顯示括號內的字
+                const parts = item.sentence.split(/{(.*?)}/);
+                // parts[0] 是前段, parts[1] 是關鍵字, parts[2] 是後段
+                
+                const strip = document.createElement('div');
+                strip.className = 'sentence-strip';
+                
+                // 組合 HTML
+                let htmlContent = `<div class="s-icon">${item.emoji}</div><div class="s-text">`;
+                
+                if (parts.length > 1) {
+                    htmlContent += `${parts[0]}<span class="blank-space" onclick="revealWord(this, '${parts[1]}')">${parts[1]}</span>${parts[2]}`;
+                } else {
+                    htmlContent += item.sentence;
+                }
+                htmlContent += `</div>`;
+
+                strip.innerHTML = htmlContent;
+                
+                // 點擊整條也發音，但不干擾填空
+                strip.onclick = (e) => {
+                    if (!e.target.classList.contains('blank-space')) {
+                        // 把括號拿掉再念
+                        const cleanSentence = item.sentence.replace('{', '').replace('}', '');
+                        speak(cleanSentence);
+                    }
+                };
+                
+                container.appendChild(strip);
+            });
+        }
+
+        function revealWord(element, word) {
+            element.classList.add('revealed');
+            speak(word); // 點擊底線時只念單字
+            event.stopPropagation(); // 防止觸發整句朗讀
+        }
+
+        // 3. 遊戲模式
+        let currentGameItem = null;
+
+        function renderGame() {
+            const gamePanel = document.createElement('div');
+            gamePanel.id = 'game-panel';
+            
+            gamePanel.innerHTML = `
+                <div style="font-size:3rem; cursor:pointer; margin-bottom:20px;" onclick="playGameAudio()">🔊</div>
+                <div id="game-instruction">聽句子，選出正確的圖片</div>
+                <div class="options-grid" id="options-grid"></div>
+                <div id="game-feedback" style="height:30px; margin-top:15px; font-weight:bold; font-size:1.2rem;"></div>
+            `;
+            
+            container.appendChild(gamePanel);
+            startNewRound();
+        }
+
+        function startNewRound() {
+            const feedback = document.getElementById('game-feedback');
+            feedback.innerText = '';
+            
+            // 隨機選一題
+            currentGameItem = vocabList[Math.floor(Math.random() * vocabList.length)];
+            
+            // 產生選項 (1個正確 + 3個錯誤)
+            let options = [currentGameItem];
+            while (options.length < 4) {
+                let randomItem = vocabList[Math.floor(Math.random() * vocabList.length)];
+                if (!options.includes(randomItem)) {
+                    options.push(randomItem);
+                }
+            }
+            
+            // 洗牌選項
+            options.sort(() => Math.random() - 0.5);
+            
+            // 渲染按鈕
+            const grid = document.getElementById('options-grid');
+            grid.innerHTML = '';
+            
+            options.forEach(opt => {
+                const btn = document.createElement('div');
+                btn.className = 'option-btn';
+                btn.innerText = opt.emoji;
+                btn.onclick = () => checkAnswer(opt, btn);
+                grid.appendChild(btn);
+            });
+
+            // 自動播放題目
+            setTimeout(playGameAudio, 500);
+        }
+
+        function playGameAudio() {
+            if (currentGameItem) {
+                // 念整句句子 (去掉括號)
+                const sentence = currentGameItem.sentence.replace('{', '').replace('}', '');
+                speak(sentence);
+            }
+        }
+
+        function checkAnswer(selectedItem, btnElement) {
+            const feedback = document.getElementById('game-feedback');
+            
+            if (selectedItem.id === currentGameItem.id) {
+                // 答對
+                btnElement.classList.add('correct-anim');
+                feedback.style.color = '#06d6a0';
+                feedback.innerText = 'Excellent! ' + selectedItem.word;
+                speak("Good job!");
+                setTimeout(startNewRound, 2000);
+            } else {
+                // 答錯
+                btnElement.classList.add('wrong-anim');
+                feedback.style.color = '#ef476f';
+                feedback.innerText = 'Try again!';
+                speak("Try again");
+            }
+        }
+
+        // 初始化
+        window.onload = () => render();
+
+    </script>
+</body>
+</html>
