@@ -3,51 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>快樂心算大挑戰</title>
+    <title>語音心算練習</title>
     <style>
-        /* 頁面基本設定 - 活潑的配色 */
+        /* CSS 樣式區 */
         body {
-            font-family: "微軟正黑體", "Comic Sans MS", sans-serif;
-            background-color: #f0f8ff;
+            font-family: "微軟正黑體", "Microsoft JhengHei", sans-serif;
+            background-color: #E0F7FA;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            padding: 20px;
             margin: 0;
+            min-height: 100vh;
         }
 
-        /* 遊戲主框 */
-        .game-container {
+        /* 遊戲主面板 */
+        .game-panel {
             background-color: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 25px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
             text-align: center;
-            max-width: 90%;
-            width: 500px;
-            border: 5px solid #FFD700; /* 金色邊框 */
+            width: 90%;
+            max-width: 500px;
+            border: 5px solid #FF9800;
+            margin-bottom: 20px;
         }
 
         h1 {
-            color: #FF6B6B;
-            margin-bottom: 30px;
-            font-size: 2.5rem;
+            color: #009688;
+            margin: 10px 0 20px 0;
+            font-size: 2.5rem; /* 字體加大 */
+            letter-spacing: 2px;
+        }
+
+        .score-board {
+            background: #FFF3E0;
+            padding: 10px 25px;
+            border-radius: 50px;
+            display: inline-block;
+            font-size: 1.8rem;
+            color: #E65100;
+            font-weight: bold;
+            margin-bottom: 20px;
         }
 
         /* 題目顯示區 */
-        .question-box {
-            font-size: 3.5rem;
-            font-weight: bold;
-            color: #4ECDC4;
-            margin: 20px 0;
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 15px;
-            letter-spacing: 5px;
+        .question-box-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
         }
 
-        /* 輸入框與按鈕 */
+        .question-box {
+            font-size: 3.5rem; /* 題目數字特大 */
+            font-weight: bold;
+            color: #3F51B5;
+            margin: 10px 0;
+            padding: 20px;
+            background: #EEEEEE;
+            border-radius: 15px;
+            letter-spacing: 3px;
+            flex-grow: 1;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* 喇叭按鈕 */
+        .speaker-btn {
+            font-size: 2.5rem;
+            background: #E3F2FD;
+            border: 2px solid #BBDEFB;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            padding: 0;
+            transition: transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .speaker-btn:active { transform: scale(0.9); background: #BBDEFB; }
+
+        /* 輸入與操作區 */
+        .input-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
         input[type="number"] {
             font-size: 2.5rem;
             width: 120px;
@@ -55,24 +105,257 @@
             text-align: center;
             border: 3px solid #ccc;
             border-radius: 15px;
-            outline: none;
-            -moz-appearance: textfield; /* 隱藏數字微調箭頭 */
-        }
-        
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
         }
 
-        input:focus {
-            border-color: #4ECDC4;
-        }
+        input:focus { border-color: #3F51B5; outline: none; }
 
-        button {
+        .submit-btn {
             font-size: 1.8rem;
             padding: 10px 30px;
-            margin-left: 15px;
-            background-color: #FF6B6B;
+            background-color: #FF5722;
             color: white;
             border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            box-shadow: 0 5px #bf360c;
+        }
+        .submit-btn:active {
+            box-shadow: 0 2px #bf360c;
+            transform: translateY(3px);
+        }
+
+        /* 提示訊息 */
+        .feedback-msg {
+            margin-top: 15px;
+            height: 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #E65100;
+        }
+
+        /* 歷史紀錄區 */
+        .history-panel {
+            width: 90%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 2px solid #E0E0E0;
+        }
+
+        .history-title {
+            font-size: 1.5rem;
+            color: #555;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #historyList {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+            font-size: 1.4rem;
+            color: #333;
+        }
+
+        .history-item.correct { background-color: #E8F5E9; color: #2E7D32; }
+        .history-item.wrong { background-color: #FFEBEE; color: #C62828; }
+        .history-item span { font-weight: bold; }
+
+    </style>
+</head>
+<body>
+
+    <div class="game-panel">
+        <h1>心算大挑戰</h1>
+        
+        <div class="score-board">
+            得分: <span id="score">0</span>
+        </div>
+
+        <div class="question-box-wrapper">
+            <div class="question-box" id="question">點我開始</div>
+            <button class="speaker-btn" onclick="speakCurrentQuestion()" title="再聽一次">🔊</button>
+        </div>
+
+        <div class="input-area">
+            <input type="number" id="answerInput" placeholder="?" autocomplete="off">
+            <button class="submit-btn" onclick="checkAnswer()">送出</button>
+        </div>
+        
+        <div class="feedback-msg" id="feedback"></div>
+    </div>
+
+    <div class="history-panel">
+        <div class="history-title">
+            📝 練習紀錄
+        </div>
+        <ul id="historyList">
+            </ul>
+    </div>
+
+    <script>
+        // 變數設定
+        let currentN1, currentN2, currentN3, currentOp1, currentOp2, currentAnswer;
+        let score = 0;
+        let questionTextForSpeech = ""; 
+        let gameStarted = false;
+
+        // 語音合成物件
+        const synth = window.speechSynthesis;
+
+        // 說話函式
+        function speak(text) {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.lang = 'zh-TW'; 
+            utterThis.rate = 0.85; // 語速稍微放慢
+            utterThis.pitch = 1.1; // 語調上揚
+            synth.speak(utterThis);
+        }
+
+        // 產生題目
+        function generateQuestion() {
+            let valid = false;
+            let n1, n2, n3, op1, op2, result, step1;
+
+            while (!valid) {
+                // 產生 3 組數字
+                n1 = Math.floor(Math.random() * 20) + 1;
+                n2 = Math.floor(Math.random() * 10) + 1;
+                n3 = Math.floor(Math.random() * 10) + 1;
+                
+                let isPlus1 = Math.random() > 0.5;
+                let isPlus2 = Math.random() > 0.5;
+
+                op1 = isPlus1 ? "+" : "-";
+                op2 = isPlus2 ? "+" : "-";
+
+                step1 = isPlus1 ? (n1 + n2) : (n1 - n2);
+                result = isPlus2 ? (step1 + n3) : (step1 - n3);
+
+                // 條件：結果 0~30，過程不出現負數
+                if (result >= 0 && result <= 30 && step1 >= 0) {
+                    valid = true;
+                    currentN1 = n1; currentN2 = n2; currentN3 = n3;
+                    currentOp1 = op1; currentOp2 = op2;
+                    currentAnswer = result;
+                }
+            }
+
+            // 更新畫面文字
+            const qText = `${n1} ${op1} ${n2} ${op2} ${n3} = ?`;
+            document.getElementById('question').innerText = qText;
+            
+            // 語音文字轉換
+            let op1Read = op1 === '+' ? '加' : '減';
+            let op2Read = op2 === '+' ? '加' : '減';
+            questionTextForSpeech = `${n1} ${op1Read} ${n2} ${op2Read} ${n3} 等於多少？`;
+
+            // 朗讀題目
+            setTimeout(() => speak(questionTextForSpeech), 300);
+
+            // 重置輸入區
+            document.getElementById('answerInput').value = '';
+            document.getElementById('answerInput').focus();
+            document.getElementById('feedback').innerText = '';
+        }
+
+        function speakCurrentQuestion() {
+            if (questionTextForSpeech) {
+                speak(questionTextForSpeech);
+            } else if (!gameStarted) {
+                gameStarted = true;
+                generateQuestion();
+            }
+        }
+
+        // 檢查答案
+        function checkAnswer() {
+            if (!gameStarted) {
+                gameStarted = true;
+                generateQuestion();
+                return;
+            }
+
+            const input = document.getElementById('answerInput');
+            const feedback = document.getElementById('feedback');
+            const userVal = parseInt(input.value);
+
+            if (isNaN(userVal)) {
+                speak("請先輸入數字喔");
+                return;
+            }
+
+            let isRight = (userVal === currentAnswer);
+            let questionStr = `${currentN1} ${currentOp1} ${currentN2} ${currentOp2} ${currentN3}`;
+
+            if (isRight) {
+                score += 10;
+                document.getElementById('score').innerText = score;
+                feedback.innerText = "✨ 答對了！";
+                feedback.style.color = "#2E7D32"; // 綠色
+                speak("答對了！好棒！");
+                
+                addToHistory(questionStr, userVal, true);
+                
+                // 1.5秒後出下一題
+                setTimeout(generateQuestion, 1500);
+            } else {
+                feedback.innerText = "❌ 再試一次";
+                feedback.style.color = "#C62828"; // 紅色
+                speak("不對，再算算看");
+                
+                addToHistory(questionStr, userVal, false);
+
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        function addToHistory(qStr, ans, isCorrect) {
+            const list = document.getElementById('historyList');
+            const li = document.createElement('li');
+            li.className = isCorrect ? 'history-item correct' : 'history-item wrong';
+            
+            const icon = isCorrect ? '✅' : '❌';
+            li.innerHTML = `
+                <span>${qStr} = ${ans}</span>
+                <span>${icon}</span>
+            `;
+            
+            list.insertBefore(li, list.firstChild);
+        }
+
+        // 按 Enter 送出
+        document.getElementById('answerInput').addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkAnswer();
+            }
+        });
+
+        // 點擊題目區也可以開始
+        document.getElementById('question').addEventListener("click", function() {
+            if (!gameStarted) {
+                gameStarted = true;
+                generateQuestion();
+            }
+        });
+
+    </script>
+</body>
+</html>
