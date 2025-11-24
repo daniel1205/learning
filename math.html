@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>快樂心算大挑戰</title>
+    <style>
+        /* 頁面基本設定 - 活潑的配色 */
+        body {
+            font-family: "微軟正黑體", "Comic Sans MS", sans-serif;
+            background-color: #f0f8ff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* 遊戲主框 */
+        .game-container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 90%;
+            width: 500px;
+            border: 5px solid #FFD700; /* 金色邊框 */
+        }
+
+        h1 {
+            color: #FF6B6B;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+
+        /* 題目顯示區 */
+        .question-box {
+            font-size: 3.5rem;
+            font-weight: bold;
+            color: #4ECDC4;
+            margin: 20px 0;
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 15px;
+            letter-spacing: 5px;
+        }
+
+        /* 輸入框與按鈕 */
+        input[type="number"] {
+            font-size: 2.5rem;
+            width: 120px;
+            padding: 10px;
+            text-align: center;
+            border: 3px solid #ccc;
+            border-radius: 15px;
+            outline: none;
+            -moz-appearance: textfield; /* 隱藏數字微調箭頭 */
+        }
+        
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input:focus {
+            border-color: #4ECDC4;
+        }
+
+        button {
+            font-size: 1.8rem;
+            padding: 10px 30px;
+            margin-left: 15px;
+            background-color: #FF6B6B;
+            color: white;
+            border: none;
